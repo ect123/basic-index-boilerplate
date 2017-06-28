@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <!-- Mapbox.js and style -->
+    <meta name="viewport" content="initial-scale=1.0, initial-scale=1.0">
+    <script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
+    <!-- jquery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <style>
+        body { margin:0; padding:0;}
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        .leaflet-control-zoom { left: 9px; top: 15px; }
+        .popup .leaflet-popup-content-wrapper { text-align:center; }
+  </style>
+  </head>
+  <body>
+    <!-- map container -->
+    <div id='map' class='popup'></div>
+  <script>
+             // *INSERT YOUR TOKEN HERE
+        L.mapbox.accessToken = '[INSERT YOUR TOKEN]';
+        var tiles = L.tileLayer('http://b.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', {
+                      transparency: true,
+             	        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'});
+             // *Change location of index .geojson
+        $.getJSON("https://raw.githubusercontent.com/ect123/boston-atlas-footprints/master/index/index-bromley-1883-bostonproper.geojson",function(data){L.geoJson(data, {onEachFeature: onEachFeature} ).addTo(map);});
+        var map = L.map('map', {
+         	            maxZoom: 19,
+                      minZoom: 12,
+                    })
+             .addLayer(tiles)
+             // *Change max and min zoom levels, and lat/long 
+             .setView([42.35265, -71.06], 12);
+             // *Adjust mouse over or geometry styles
+        var style = {
+            color:"blue", opacity:".8", weight:"2", fillOpacity:".3"};
+        var stylemo = {
+            color:"blue", opacity:".8", weight:"4", fillOpacity:".5"};
+             // *Format popup window 
+        function onEachFeature(feature, layer) {
+            {layer.bindPopup("This is <strong>Plate " + feature.properties.plate + "</strong></h1> From: <em>" + feature.properties.atlas + "</em>" +
+              '<a href="' + layer.feature.properties.url + ' " target="_blank"><h2>VIEW ONLINE<\/h2><\/a>' );
+                layer.setStyle(style);
+                (function (layer, properties){
+                	layer.on("mouseover", function(e){
+                		layer.setStyle(stylemo);});
+                	layer.on("mouseout", function(e){
+                		layer.setStyle(style);});
+                })(layer, feature.properties);}}; 
+  </script>
+  </body>
+</html>
